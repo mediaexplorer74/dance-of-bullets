@@ -1,6 +1,13 @@
 # Dance of Bullets
 
-## A little backstory
+## About
+My fork of cool Bullet-hell shooter ((with a simple format for levels & bosses) to make my own UWP replica ;)
+
+## My 2 cents
+- .NET Framework 4.8 & Monogame 3.8 support added (for my 12-yeard old Sony Vaio notebook)))
+- Micro-RnD (I specially tried DotPeek for DoB R.E., and result is 0% of bugs, that's ideal automation!)))
+
+## A little backstory from the author
 
 Dance of Bullets is a bullet hell shmup I worked on mostly in 2012 using the XNA framework, mostly driven by the fact that there weren't many games in this genre on the PC outside japan at the time. (And / or they were hard to access.) This isn't an issue anymore as Steam became more open to submissions, so I slowly stopped developing DoB, especially as support for XNA has been ended by Microsoft.
 
@@ -70,7 +77,7 @@ Here's an example pattern definition
 
 And this is the result
 
-![Bullet pattern example](readme/pattern-example.gif)
+![Bullet pattern example](Images/pattern-example.gif)
 
 There's no significance to the naming of these files other than `Stages.xaml`. You can add new files and put new enemies, behaviors, bullets etc. in them as long as you reference them in the correct order in the _PrototypePacks_ attribute of the root element of `Stages.xaml`
 
@@ -78,4 +85,19 @@ There's no significance to the naming of these files other than `Stages.xaml`. Y
 
 You don't need to rebuild the game if you only change the XAML files – restarting the game is enough to apply the changes.
 
-If you want to clone the whole repo and build everything from source, then you'll need _Visual Studio 2017 Community_ and _MonoGame 3.6_.
+If you want to clone the whole repo and build everything from source, then you'll need _Visual Studio 2022 (or even 2017) Community_ and _MonoGame 3.8_.
+
+## Credits / Thanks
+- https://github.com/madve2 Dániel Kis-Nagy aka madve2, Great C#/MonoGame Developer 
+- https://github.com/madve2/dance-of-bullets Dance of Bullets game
+
+## Licensing
+- GNU GENERAL PUBLIC LICENSE
+
+## ..
+AS IS. No support. RnD only / DIY
+
+## .
+[m][e] 2024
+
+
