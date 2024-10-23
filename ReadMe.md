@@ -1,81 +1,39 @@
-# Dance of Bullets
+## Dance-of-Bullets v1.0.0 (alpha) - uwp branch
+![](Images/logo.png)
 
-## A little backstory
+My micro-RnD of Dance-of-Bullets (Fast and ultra dynamic action game when you need to destroy every squares and protect yours)) shooter platformer smaple :)
 
-Dance of Bullets is a bullet hell shmup I worked on mostly in 2012 using the XNA framework, mostly driven by the fact that there weren't many games in this genre on the PC outside japan at the time. (And / or they were hard to access.) This isn't an issue anymore as Steam became more open to submissions, so I slowly stopped developing DoB, especially as support for XNA has been ended by Microsoft.
+My main goal is/was: adaptation for W10M (Astoria included). 
+And second (goal): add some "virtual pad" =)
 
-## What's the point of adding it to GitHub, then?
 
-Looking at the current selection of bullet hell games, while there's definitely a plenty of them, there's one aspect of DoB that feels unique to me: its flexible, highly extensible and easy-to-create format for levels, enemies and bosses, that could make it possible for everyone to create their own bullet hell shmup without programming knowledge of any kind.
+## My 2 cents (status)
+- Project's compiling - ok at now ;)
+- W10M UWP adaptation init...
+- VS 2017 (IDE) compatibility for best W10M debug process (?)
+- Min. W10M build: 10240 (hello, Astoria!)
+- Work-in-progress (Config/Storage handling, etc.)
 
-Ideally, the goal is to release it as a free game on Steam, with workshop support for levels. Realistically, I want to clean up the code and assets a bit, make adding custom content even more flexible, and releasing it on Itch.
+## DoB Project Explanation (words from the author)
+"Dance of Bullets is a bullet hell shmup I worked on mostly in 2012 using the XNA framework, mostly driven by the fact that there weren't many games in this genre on the PC outside japan at the time. (And / or they were hard to access.) This isn't an issue anymore as Steam became more open to submissions, so I slowly stopped developing DoB, especially as support for XNA has been ended by Microsoft." -Dániel Kis-Nagy
 
-## The current state
+## How to build it
+- fork my solution
+- open it with VS 2022 preview
+- Start /Launch it and catch 100500 bugs, hehe! :)
 
-:x: | The bad news
----|---
-:x: | There's no menu or settings. The game just starts when you run it, and you can't restart when you die (or reach the end of the last stage). There's a config file, but it only supports setting a resolution. Fixed keybindings with no controller support.
-:x: | Only has placeholder assets (especially on the second and third level of the alpha), barebones HUD.
-:x: | While objects can move across the screen in fascinating ways, there's no support for animated textures yet.
-:x: | No sounds or music.
+## References / Useful links
+- https://github.com/madve2 Dániel Kis-Nagy aka madve2, Great C#/MonoGame Developer
+- https://github.com/madve2/dance-of-bullets Original Dance of Bullets project
 
-:heavy_check_mark: | The good news
----|---
-:heavy_check_mark: | Supports levels, bosses, even mid-level bosses, and "scriptable" enemy movement.
-:heavy_check_mark: | Complex and highly customizable (composable, even) bullet patterns.
-:heavy_check_mark: | Special abilities: slow-down time and "rain of bullets".
-:heavy_check_mark: | A sophisticated, XAML-based level format with a huge focus on flexibility, reusability and extensibility. After reading the documentation (coming soon...) it should be easy to create new enemies, bosses and complete levels (even campaigns) without programming knowledge / modifying the code.
-:heavy_check_mark: | *NEW in Bullet Bash Edition:* Self-adjusting difficulty – the longer you fly without getting hit, the quicker the game becomes. In turn, getting hit reduces the speed, allowing you to catch your breath.
-:heavy_check_mark: | *NEW in Bullet Bash Edition:* Scoring! Shooting down enemies will now award you with delicious points depending on their toughness and the current difficulty level.
+## ToDo
+- Fix screen auto-scaling (known bug: only half of game drawn on my Lumia 940 with W10M Astoria)))
+- Realize some menu, and normal game exit after game over ;)) 
 
-:lipstick: | Code quality
----|---
-:lipstick: | As the codebase evolved, I noticed that some of my internal concepts (like Component and Behavior) have many similarities, offering many refactoring opportunities!
-:lipstick: | Some of the built-in behaviors became quite redundant as the core system got more flexible. Probably I could delete some code.
-:lipstick: | Although MonoGame opens the possibility to make the game work on non-Windows systems, I use Windows specific APIs for reading XAML. Porting to macOS and Linux should be possible, but challenging.
-:lipstick: | No documentation, although it would be very important, especially for prospect level creators. This is one of the first things on my TODO list.
+## ..
+AS IS. No support. RnD only / DIY
 
-## Playing the game
+## .
+[m][e] 2024
 
-Download the current alpha and take it for a spin from [Itch](https://madve2.itch.io/dance-of-bullets)! You can find how-to-play instructions there.
 
-## Making your own levels
-
-While I've yet to make a proper documentation for the level format of Dance of Bullets, open the files in the _StageData_ folder with your favorite text editor and start tweaking! You will be able to add your own levels, enemies, bullet patterns and bosses in no time!
-
-Some pointers until I write some proper documentation:
-
-- `Stages.xaml` is the main file the game loads. It contains _Stages_ (essentially, the levels) which will be loaded in the order they are in the file. A stage consists of multiple _Segments_, each with its own boss(es). Segments contain _EnemySpawners_, which orchestrate the timing of the appearance of the various enemies on the level / segment.
-- `Prototypes-1.xaml`, `Prototypes-2.xaml`​  and `PrototypesRC-1.xaml`​ contain _Enemy_ definitions, referenced by the _EnemySpawners_ in `Stages.xaml`. It governs how they move, what they look like, how though they are etc. Their shooting patterns are, however, a bit more complicated, so those usually appear in the last file, called...
-- `Prototypes-Common.xaml`: it contains various _constants_ (e.g. colors), _behaviors_ (which in this case are mostly bullet pattern definitions referenced by the enemies) and _bullet_ definitions for the bullet patterns. (Essentially, a bullet definition specifies how a bullet moves once it's been shot, while a `*TurretBehavior` defines how and when exactly should the shooting happen.)
-
-Here's an example pattern definition
-
-```
-<b:TurningTurretBehavior x:Key="SpiralSlicesTurret"
-                         Alpha="{dx:Degrees 180}"
-                         GunCooldownMs="80"
-                         TurnAfterShoot="{dx:Degrees -16}">
-    <g:MultiBullet BaseTexture="bullet1"
-                   CollisionBoxScale="0.4"
-                   Count="5"
-                   DegIncrement="{dx:Degrees 3}"
-                   DuplicateCooldownMs="80"
-                   R="8">
-        <b:RadialMovementBehavior Vr="200" />
-        <b:CircularMovementBehavior Aper="-10" Vper="-10" />
-    </g:MultiBullet>
-</b:TurningTurretBehavior>
-```
-
-And this is the result
-
-![Bullet pattern example](readme/pattern-example.gif)
-
-There's no significance to the naming of these files other than `Stages.xaml`. You can add new files and put new enemies, behaviors, bullets etc. in them as long as you reference them in the correct order in the _PrototypePacks_ attribute of the root element of `Stages.xaml`
-
-## Building the game
-
-You don't need to rebuild the game if you only change the XAML files – restarting the game is enough to apply the changes.
-
-If you want to clone the whole repo and build everything from source, then you'll need _Visual Studio 2017 Community_ and _MonoGame 3.6_.
