@@ -18,6 +18,7 @@ using System.Diagnostics;
 using DoB.Components;
 using System.Globalization;
 using DoB.Extensions;
+using Windows.Data.Xml.Dom;
 
 
 namespace DoB
@@ -58,33 +59,111 @@ namespace DoB
 
 		private Cooldown stageTransitionEffectCooldown = new Cooldown();
 		private Texture2D stageTransitionEffect;
-		private Config cfg;
+		private Config cfg = new Config(); //
 
 		public Game1()
 		{
 			graphics = new GraphicsDeviceManager( this );
 			Content.RootDirectory = "Content";
 
-			//RnD
-			cfg = default;//(Config)XamlServices.Parse( File.ReadAllText( "Config.xaml" ) );
 			
-			GameplayRectangle = new Rectangle( 0, 0, 1280, 720 ); //the size of the gameplay area, regardless of the actually rendered resolution
-			DrawingRectangle = new Rectangle( 0, 0, 
-				/*(int)cfg["ResolutionW"]*/640, 
-				/*(int)cfg["ResolutionH"]*/400 );
-			graphics.PreferredBackBufferWidth = DrawingRectangle.Width;
-			graphics.PreferredBackBufferHeight = DrawingRectangle.Height;
-			graphics.IsFullScreen = (bool)cfg["IsFullScreen"];
-			graphics.ApplyChanges();
-		}
+            //RnD
+            string xaml = File.ReadAllText("Config.xaml");
 
-		/// <summary>
-		/// Allows the game to perform any initialization it needs to before starting to run.
-		/// This is where it can query for any required services and load any non-graphic
-		/// related content.  Calling base.Initialize will enumerate through any components
-		/// and initialize them as well.
-		/// </summary>
-		protected override void Initialize()
+            //-----------------------------------------------------------------
+            //cfg = (Config)XamlServices.Parse(xaml);
+            var doc = new XmlDocument();
+            doc.LoadXml(xaml);
+
+
+
+            IXmlNode xmlContent = default;
+            object Result = default;
+
+            XmlNodeList tags = doc.GetElementsByTagName("x:String");
+
+            if (tags.Count > 0)
+            {
+                xmlContent = tags.First();
+				Result = xmlContent.InnerText;
+                //bad1 - firstContent.Attributes.GetNamedItem("StageDataFile").InnerText;
+                //bad2 - xmlContent.InnerText;
+
+                cfg["StageDataFile"] = (object)Result;
+            }
+
+
+            tags = doc.GetElementsByTagName("x:Int32");			
+
+            if (tags.Count > 0)
+            {
+				xmlContent = tags[0];//tags.First();
+                Result = xmlContent.InnerText;
+
+                cfg["ResolutionW"] = (object)Result;
+
+                xmlContent = tags[1];
+				Result = xmlContent.InnerText;
+
+                cfg["ResolutionH"] = (object)Result;
+
+            }
+
+            tags = doc.GetElementsByTagName("x:Boolean");
+
+            if (tags.Count > 0)
+            {
+                xmlContent = tags.First();
+                Result = xmlContent.InnerText;
+
+                cfg["IsFullScreen"] = (object)Result;
+            }
+
+
+
+            //-----------------------------------------------------------------
+
+
+            //TEMP
+            //cfg["StageDataFile"] = "StageData\\Stages.xaml";
+            //cfg["ResolutionW"] = 640;
+            //cfg["ResolutionH"] = 400;
+            //cfg["IsFullScreen"] = false;
+
+            GameplayRectangle = new Rectangle(0, 0, 1280, 720); //the size of the gameplay area, regardless of the actually rendered resolution
+           
+			object W = cfg["ResolutionW"];
+            object H = cfg["ResolutionH"];
+
+            int W2 = 0;
+            int H2 = 0;
+
+            string W1 = (string)cfg["ResolutionW"];
+            string H1 = (string)cfg["ResolutionH"];
+
+            bool checkInt = Int32.TryParse(W1, out W2);
+            checkInt = Int32.TryParse(H1, out H2);        
+
+            DrawingRectangle = new Rectangle(0, 0, (int)W2, (int)H2);
+
+            graphics.PreferredBackBufferWidth = DrawingRectangle.Width;
+            graphics.PreferredBackBufferHeight = DrawingRectangle.Height;
+
+			bool F2 = false;
+            string F1 = (string)cfg["IsFullScreen"];
+            checkInt = Boolean.TryParse(F1, out F2);
+            graphics.IsFullScreen = (bool)F2;
+            
+			graphics.ApplyChanges();
+        }
+
+        /// <summary>
+        /// Allows the game to perform any initialization it needs to before starting to run.
+        /// This is where it can query for any required services and load any non-graphic
+        /// related content.  Calling base.Initialize will enumerate through any components
+        /// and initialize them as well.
+        /// </summary>
+        protected override void Initialize()
 		{
 			GameObject.Game = this;
 			base.Initialize();
@@ -99,15 +178,59 @@ namespace DoB
 			spriteBatch = new SpriteBatch( GraphicsDevice );
 
 			InitializeRenderTarget();
-			renderTargetTmp = new RenderTarget2D( GraphicsDevice, DrawingRectangle.Width, DrawingRectangle.Height );
+			renderTargetTmp = new RenderTarget2D( GraphicsDevice, 
+				DrawingRectangle.Width, DrawingRectangle.Height );
 
 			font = Content.Load<SpriteFont>( "SpriteFont1" );
 			stageTransitionEffect = Content.Load<Texture2D>( "white" );
 
 			//TODO
-			Stages = ( (Stages)XamlServices.Parse( File.ReadAllText( (string)cfg["StageDataFile"] ) ) );
-			
-			StageIndex = 0;
+
+			string storagePath = (string)cfg["StageDataFile"];
+
+            string xaml = File.ReadAllText(storagePath );
+
+			//----------------------------------------------------------
+			//Stages = (Stages)XamlServices.Parse( xaml );
+			Stages = new Stages();
+
+            var doc = new XmlDocument();
+            doc.LoadXml(xaml);
+
+
+            IXmlNode xmlContent = default;
+            object Result = default;
+
+            XmlNodeList tags = doc.GetElementsByTagName("c:Stage");
+
+            if (tags.Count > 0)
+            {
+				xmlContent = tags[0];//.First();
+                XmlNodeList childnodes = xmlContent.ChildNodes;
+
+                // +++++++++++++++++++++++++
+
+                IXmlNode xmlContent1 = childnodes[0]; // First
+                object Result1 = default;
+
+                //XmlNodeList tags1 = xmlContent1.GetXml("c:EnemySpawner");
+
+				if (xmlContent1.Attributes.Count > 0)
+				{
+					Debug.WriteLine(xmlContent1.Attributes);
+				}
+                    // +++++++++++++++++++++++++
+
+
+                    //bad1 - firstContent.Attributes.GetNamedItem("StageDataFile").InnerText;
+                    //bad2 - xmlContent.InnerText;
+
+                    //cfg["StageDataFile"] = (object)Result;
+                }
+
+            //----------------------------------------------------------
+
+            StageIndex = 0;
 			this.ShmupComponents.Add( Stages[StageIndex] );
 
 			LoadStageTextures();
@@ -124,13 +247,17 @@ namespace DoB
 				bgX = new List<double>();
 				for (int i = 0; i < Stages[StageIndex].BackgroundTextureArray.Length; i++)
 				{
-					bgTextures.Add(Content.Load<Texture2D>(Stages[StageIndex].BackgroundTextureArray[i]));
+					bgTextures.Add
+						(Content.Load<Texture2D>(Stages[StageIndex].BackgroundTextureArray[i]));
+					
 					bgX.Add(0);
 				}
 			}
 			else
 			{
-				bgTextures = new List<Texture2D> { Content.Load<Texture2D>(Stages[StageIndex].BackgroundTexture) };
+				bgTextures = new List<Texture2D> 
+				{ Content.Load<Texture2D>(Stages[StageIndex].BackgroundTexture) };
+				
 				bgX = new List<double> { 0 };
 			}
 		}
@@ -139,12 +266,15 @@ namespace DoB
 		{
 			if( !debug_showBulletPaths )
 			{
-				renderTarget = new RenderTarget2D( GraphicsDevice, GameplayRectangle.Width, GameplayRectangle.Height );
+				renderTarget = new RenderTarget2D( 
+					GraphicsDevice, GameplayRectangle.Width, GameplayRectangle.Height );
 			}
 			else
 			{
-				renderTarget = new RenderTarget2D( GraphicsDevice, GameplayRectangle.Width, GameplayRectangle.Height,
-					false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents );
+				renderTarget = new RenderTarget2D( GraphicsDevice,
+					GameplayRectangle.Width, GameplayRectangle.Height,
+					false, SurfaceFormat.Color, DepthFormat.None, 
+					0, RenderTargetUsage.PreserveContents );
 			}
 		}
 
@@ -160,6 +290,7 @@ namespace DoB
 		/// </summary>
 		protected override void UnloadContent()
 		{
+			//
 		}
 
 		/// <summary>
@@ -171,10 +302,12 @@ namespace DoB
 		protected override void Update( GameTime gameTime )
 		{
 			// Allows the game to exit
-			if( GamePad.GetState( PlayerIndex.One ).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape) )
+			if( GamePad.GetState( PlayerIndex.One ).Buttons.Back == ButtonState.Pressed 
+				|| Keyboard.GetState().IsKeyDown(Keys.Escape) )
 				this.Exit();
 
-			if (Keyboard.GetState().IsKeyDown(Keys.LeftAlt) && Keyboard.GetState().IsKeyDown(Keys.Enter))
+			if (Keyboard.GetState().IsKeyDown(Keys.LeftAlt) 
+				&& Keyboard.GetState().IsKeyDown(Keys.Enter))
 			{
 				graphics.IsFullScreen = !graphics.IsFullScreen;
 				graphics.ApplyChanges();
@@ -207,7 +340,9 @@ namespace DoB
 
 					var bo = (Collideable)Objects[j];
 					debug_collChecks++;
-					if( Vector2.Distance( new Vector2( (float)ao.X, (float)ao.Y ), new Vector2( (float)bo.X, (float)bo.Y ) ) < ( (float)ao.CollisionRadius + (float)bo.CollisionRadius ) )
+					if( Vector2.Distance( new Vector2( (float)ao.X, (float)ao.Y ), 
+						new Vector2( (float)bo.X, (float)bo.Y ) ) 
+						< ( (float)ao.CollisionRadius + (float)bo.CollisionRadius ) )
 					{
 						ao.CollideWith( bo );
 						bo.CollideWith( ao );
@@ -289,11 +424,16 @@ namespace DoB
 				Objects[i].Draw( gameTime, spriteBatch );
 			}
 
-			spriteBatch.DrawString( font, $"Health: {Player.Health.Amount} | Multiplier: {GameSpeedManager.DifficultyMultiplier.ToString("N2", CultureInfo.InvariantCulture)}x | Score: {ScoreKeeper.Score.ToString("N0", CultureInfo.InvariantCulture)}", new Vector2( 650, 6 ), Color.White );
+			spriteBatch.DrawString( font,
+				$"Health: {Player.Health.Amount} | Multiplier: {GameSpeedManager.DifficultyMultiplier.ToString("N2", CultureInfo.InvariantCulture)}x | Score: {ScoreKeeper.Score.ToString("N0", CultureInfo.InvariantCulture)}", 
+				new Vector2( 650, 6 ), 
+				Color.White );
 
 			if ( !stageTransitionEffectCooldown.IsElapsed )
 			{
-				spriteBatch.Draw( stageTransitionEffect, GameplayRectangle, Color.FromNonPremultiplied( 255, 255, 255, (int)( 255 * ( 1 - stageTransitionEffectCooldown.Progress ) ) ) );
+				spriteBatch.Draw( stageTransitionEffect, GameplayRectangle, 
+					Color.FromNonPremultiplied( 255, 255, 255,
+					(int)( 255 * ( 1 - stageTransitionEffectCooldown.Progress ) ) ) );
 			}
 
 			spriteBatch.End();
@@ -303,15 +443,19 @@ namespace DoB
 		List<Texture2D> bgTextures = null;
 		List<double> bgX = null;
 
-		private void DrawBackground( GameTime gameTime, Texture2D bgTexture, double v, int textureWidth, ref double x, int y = 0 )
+		private void DrawBackground( GameTime gameTime, Texture2D bgTexture,
+			double v, int textureWidth, ref double x, int y = 0 )
 		{
-			x += (double)GameSpeedManager.ApplySpeed( v, gameTime.ElapsedGameTime.TotalMilliseconds );
+			x += (double)GameSpeedManager.ApplySpeed( v,
+				gameTime.ElapsedGameTime.TotalMilliseconds );
+
 			if( x < -textureWidth )
 				x = 0;
 			var color = Player.IsPaybackActive ? Color.FromNonPremultiplied( 255, 50, 255, 255 )
 				: Player.IsManaActive ? Color.FromNonPremultiplied( 50, 50, 255, 255 ) : Color.White;
 			spriteBatch.Draw( bgTexture, new Rectangle( (int)x, y, textureWidth, 768 ), color );
-			spriteBatch.Draw( bgTexture, new Rectangle( (int)( x < 0 ? x + textureWidth : x - textureWidth ), y, textureWidth, 768 ), color );
+			spriteBatch.Draw( bgTexture, new Rectangle( (int)( x < 0 
+				? x + textureWidth : x - textureWidth ), y, textureWidth, 768 ), color );
 		}
 
 		DateTime debug_lastSkipTime = DateTime.MinValue;

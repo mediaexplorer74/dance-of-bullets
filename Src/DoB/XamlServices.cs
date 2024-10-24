@@ -7,10 +7,10 @@ namespace DoB
 {
     public class XamlServices
     {
-        public static object Parse(string v)
+        public static object Parse(string xaml)
         {
             // TODO
-            return null;
+            return default;
         }
                
     }
