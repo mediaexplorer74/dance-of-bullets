@@ -6,6 +6,9 @@ My micro-RnD of Dance-of-Bullets (Fast and ultra dynamic action game when you ne
 My main goal is/was: adaptation for W10M (Astoria included). 
 And second (goal): add some "virtual pad" =)
 
+## Screenshot(s)
+![](Images/shot01.png)
+![](Images/shot02.png)
 
 ## My 2 cents (status)
 - Project's compiling - ok at now ;)

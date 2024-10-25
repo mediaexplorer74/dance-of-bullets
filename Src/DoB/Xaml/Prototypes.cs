@@ -22,8 +22,9 @@ namespace DoB.Xaml
 		public static Prototypes LoadFrom( string path )
 		{
 			var xaml = File.ReadAllText(path);
+            XamlServices xamlServices = new XamlServices();
 
-            return (Prototypes)XamlServices.Parse( xaml );
+            return (Prototypes)xamlServices.Parse3( xaml );
 		}
 
 		protected override void OnKeyAssigned( string key )

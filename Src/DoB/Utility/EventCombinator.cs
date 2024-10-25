@@ -9,7 +9,8 @@ namespace DoB.Utility
 	{
 		private static int nextId = 0;
 
-		private static Dictionary<string, EventCombination> combinators = new Dictionary<string, EventCombination>();
+		private static Dictionary<string, EventCombination> combinators 
+			= new Dictionary<string, EventCombination>();
 
 		public static string Combine( string[] eventList )
 		{

@@ -39,6 +39,7 @@ namespace DoB.Utility
 			}
 		}
 
-		private static Dictionary<string, List<Action<string>>> subscriptions = new Dictionary<string, List<Action<string>>>();
+		private static Dictionary<string, List<Action<string>>> subscriptions 
+			= new Dictionary<string, List<Action<string>>>();
 	}
 }
